@@ -15,9 +15,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
-    }
-
+        // Temporarily run the command every minute for testing
+    $schedule->command('report:weekly')->everyMinute();
+ }
+    
     /**
      * Register the commands for the application.
      *
