@@ -1,30 +1,31 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\VehicleController;
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+use App\Http\Controllers\ReportController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+// Authentication routes
+Auth::routes();
 
-Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicle.index');
-Route::post('/vehicle', [VehicleController::class, 'store'])->name('vehicle.store');
-Route::get('/vehicle/{id}/edit', [VehicleController::class, 'edit'])->name('vehicle.edit');
-Route::delete('/vehicle/{id}', [VehicleController::class, 'destroy'])->name('vehicle.destroy');
+// Other routes
+// Admin routes
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::post('/vehicles', [VehicleController::class, 'store']);
+    Route::put('/vehicles/{id}', [VehicleController::class, 'update']);
+    Route::delete('/vehicles/{id}', [VehicleController::class, 'destroy']);
+});
 
-// Existing routes...
-
-// Route to update a vehicle
-Route::put('/vehicle/{id}', [VehicleController::class, 'update'])->name('vehicle.update');
+// Driver routes
+Route::middleware(['auth', 'role:driver'])->group(function () {
+    Route::get('/vehicles', [VehicleController::class, 'index']);
+    Route::get('/vehicles/{id}', [VehicleController::class, 'show']);
+});
+// Redirect authenticated users to /vehicles
+Route::get('/home', function () {
+    return redirect('/vehicles');
+});
